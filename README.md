@@ -24,7 +24,7 @@ into
 
 ```
    python ./terraform-sg-diff.py
-   *PASTE SG CHANGES*
+   *PASTE TERRAFORM SG CHANGES*
    <Ctrl+D>
 ```
 
