@@ -13,13 +13,18 @@ Quickly knocked up script to turn:
 ...
 ```
 
-into::
+into
+
+```
     Added rule 443_tcp_10.0.0.0/8
+```
 
 
 ## How to run
 
+```
    python ./terraform-sg-diff.py
    *PASTE SG CHANGES*
    <Ctrl+D>
+```
 
