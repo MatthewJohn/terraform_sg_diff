@@ -26,38 +26,38 @@ for line in fileinput.input():
             rules[group_id][m.group(2)] = [m.group(4), m.group(5)]
 old = {}
 new = {}
+
+OLD = 'OLD'
+NEW = 'NEW'
+
+def add_rule(port, proto, id_, map_):
+    key_ = "{}_{}_{}".format(port, proto, id_)
+    if key_ in map_:
+        print 'ERROR: Duplicate rule: ' + key_
+    else:
+        map_[key_] = [port, proto, id_]
+
 for group_id in rules:
     port = rules[group_id]['from_port'][0] if (rules[group_id]['from_port'][0] != '0' and rules[group_id]['from_port'][0] != '') else rules[group_id]['from_port'][1]
     proto = rules[group_id]['protocol'][0] if rules[group_id]['protocol'][0] != '' else rules[group_id]['protocol'][1]
     proto = proto.lower()
     if 'security_groups' in rules[group_id]:
         for sg in rules[group_id]['security_groups']:
+            _map_ref = None
+            _id = None
             if sg[0]:
-                old["%s_%s_%s" % (port,
-                                  proto,
-                                  sg[0])] = [port,
-                                             proto,
-                                             sg[0]]
+                add_rule(port, proto, sg[0], old)
             if sg[1]:
-                new["%s_%s_%s" % (port,
-                                  proto,
-                                  sg[1])] = [port,
-                                             proto,
-                                             sg[1]]
+                add_rule(port, proto, sg[1], new)
     if 'cidr_blocks' in rules[group_id]:
         for ip in rules[group_id]['cidr_blocks']:
             if ip[0]:
-                old["%s_%s_%s" % (port,
-                                  proto,
-                                  ip[0])] = [port,
-                                             proto,
-                                             ip[0]]
+                add_rule(port, proto, ip[0], old)
+
             if ip[1]:
-                new["%s_%s_%s" % (port,
-                                  proto,
-                                  ip[1])] = [port,
-                                             proto,
-                                             ip[1]]
+                add_rule(port, proto, ip[1], new)
+
+
 for old_rule in old:
     if old_rule not in new:
         print 'Removed rule: %s' % old_rule
