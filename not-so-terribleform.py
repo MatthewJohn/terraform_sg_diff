@@ -12,12 +12,18 @@ for line in fileinput.input():
         break
 
     m = re.match(r".*ingress\.([0-9]+)\.([a-z_]+)([^:]*)\:\s+\"(.*)\" => \"(.*)\".*", line)
+    # group 0 valid match
+    # group 1 group id
+    # group 2 group access type
+    # group 3 group rule number
+    # group 4 current value
+    # group 5 new value
     if m and m.group(0):
         group_id = m.group(1)
         if group_id not in rules:
             rules[group_id] = {}
 
-        if m.group(2) in ['security_groups', 'cidr_blocks']:
+        if m.group(2) in ['security_groups', 'cidr_blocks','prefix_list_ids']:
             if m.group(2) not in rules[group_id]:
                 rules[group_id][m.group(2)] = []
             if m.group(3) != '.#':
@@ -56,6 +62,12 @@ for group_id in rules:
 
             if ip[1]:
                 add_rule(port, proto, ip[1], new)
+    if 'prefix_list_ids' in rules[group_id]:
+        for pl in rules[group_id]['prefix_list_ids']:
+            if pl[0]:
+                add_rule(port, proto, pl[0], old)
+            if pl[1]:
+                add_rule(port, proto, pl[1], new)
 
 
 for old_rule in old:
